@@ -1,18 +1,36 @@
 <script setup lang="ts">
-import { userLocationStore } from '../stores/location'
+import { ref, computed } from 'vue'
+// import { userLocationStore } from '../stores/location'
 import { weatherStore } from '../stores/weather'
 import navBar from './navbar-component.vue'
-// import weatherComponent from './weather-comp.vue'
 import headerImg from '../assets/images/bg-header.jpg'
 import weatherImg from '../assets/images/weather-bg.jpg'
-const location_Store = userLocationStore()
-const weather_Store = weatherStore()
-location_Store.getUserLocation()
-weather_Store.getWeather()
+const Store = weatherStore()
+const dataDone = ref(false)
+let weather_obj = computed(() => {
+  return Store.weatherObj
+})
+const timeNow = new Date(Date.now())
+const celsiusDegree = ref(true)
+// const celsiusDegree = () => {}
+setTimeout(() => {
+  if (Store.doneData) {
+    dataDone.value = true
+  } else {
+    dataDone.value = false
+  }
+}, 5000)
 </script>
 
 <template>
   <div
+    v-if="!Store.doneData"
+    class="flex items-center justify-center w-screen h-screen text-center text-white bg-indigo-900"
+  >
+    loading...
+  </div>
+  <div
+    v-else
     class="relative flex flex-wrap items-center content-start justify-center w-screen h-screen overflow-y-scroll align-middle isolate"
   >
     <navBar class="w-full" />
@@ -30,8 +48,10 @@ weather_Store.getWeather()
           <div class="flex flex-wrap items-stretch justify-center w-full h-full p-2 content-evenly">
             <span
               class="flex flex-wrap justify-center w-full text-2xl font-semibold tracking-wide text-white"
-              >London
-              <span class="w-full text-sm font-semibold tracking-wide text-white">clody</span>
+              >{{ weather_obj.name }}
+              <span class="w-full text-sm font-semibold tracking-wide text-white">{{
+                weather_obj.weather[0].main
+              }}</span>
             </span>
             <!-- <span class="self-start w-full text-xl font-semibold tracking-wide text-white"
             >clody</span
@@ -39,10 +59,39 @@ weather_Store.getWeather()
             <!-- <span class="self-center w-full text-2xl font-semibold tracking-wide text-white"
               >icon</span
             > -->
-            <img src="https://openweathermap.org/img/wn/01d@4x.png" alt="" />
-            <span class="self-end w-full text-5xl font-semibold tracking-wide text-white"
-              >10°c</span
-            >
+            <img
+              :src="`https://openweathermap.org/img/wn/${weather_obj.weather[0].icon}@4x.png`"
+              alt=""
+            />
+            <span
+              class="flex flex-row items-center justify-center w-full text-5xl font-semibold tracking-wide text-white flex-nowrap"
+              ><span class="px-2" v-if="celsiusDegree">{{
+                Math.floor(weather_obj.main.feels_like)
+              }}</span>
+              <span class="px-2" v-else>{{
+                Math.floor(Math.floor(weather_obj.main.feels_like) * (9 / 5) + 32)
+              }}</span>
+              <span class="flex flex-col">
+                <button
+                  class="flex-1 inline-block px-1 my-1 text-xl rounded-lg bg-white/5 hover:bg-white/20"
+                  :class="celsiusDegree == true ? 'text-white' : 'text-white/50'"
+                  @click="celsiusDegree = true"
+                >
+                  °c
+                </button>
+                <button
+                  class="flex-1 inline-block px-1 text-xl rounded-lg bg-white/5 hover:bg-white/20"
+                  :class="celsiusDegree == false ? 'text-white' : 'text-white/50'"
+                  @click="celsiusDegree = false"
+                >
+                  °f
+                </button>
+              </span>
+            </span>
+            <div class="flex self-end justify-between w-full text-white">
+              <span>{{ timeNow.toDateString() }}</span>
+              <span>test2</span>
+            </div>
           </div>
 
           <img

@@ -1,79 +1,29 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-// import { userLocationStore } from './location'
 import { useCookies } from 'vue3-cookies'
-
-// interface weatherObj_body {
-//   coord: {
-//     lon: number
-//     lat: number
-//   }
-//   weather: [
-//     {
-//       id: number
-//       main: string
-//       description: string
-//       icon: string
-//     }
-//   ]
-//   base: string
-//   main: {
-//     temp: number
-//     feels_like: number
-//     temp_min: number
-//     temp_max: number
-//     pressure: number
-//     humidity: number
-//     sea_level: number
-//     grnd_level: number
-//   }
-//   visibility: number
-//   wind: {
-//     speed: number
-//     deg: number
-//     gust: number
-//   }
-//   rain: {
-//     '1h': number
-//   }
-//   clouds: {
-//     all: number
-//   }
-//   dt: number
-//   sys: {
-//     type: number
-//     id: number
-//     country: string
-//     sunrise: number
-//     sunset: number
-//   }
-//   timezone: number
-//   id: number
-//   name: string
-//   cod: number
-// }
 
 export const weatherStore = defineStore('weatherStore', () => {
   const weatherObj = ref<any>()
   const doneData = ref(false)
-  // const locationStore = userLocationStore()
   const { cookies } = useCookies()
   const latitude = cookies.get('userLatitude')
   const longitude = cookies.get('userLongitude')
+  const SRC = ref('')
+  const allCountries = ref<any>()
+  const country = ref<any>()
+  const countrySRC = ref('')
 
   const getWeather = async () => {
-    // const config = {
-    //   method: 'get',
-    //   url: `https://api.openweathermap.org/data/3.0/onecall?lat=${parseFloat(latitude)}&lon=${parseFloat(longitude)}&exclude=current&appid=753e76947b3fe09073506b55df5fe9ef`
-    // }
-    //http://api.weatherapi.com/v1/current.json?key=ba6ee5f12608467fb2410438240204&q=${parseFloat(latitude)},${parseFloat(longitude)}&lang=ar
-    await axios
-      .get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${parseFloat(latitude)}&lon=${parseFloat(longitude)}&units=metric&mode=json&appid=753e76947b3fe09073506b55df5fe9ef`
-      )
-      .then((response) => {
+    const config = {
+      method: 'get',
+      url: `https://api.openweathermap.org/data/2.5/weather?lat=${parseFloat(latitude)}&lon=${parseFloat(longitude)}&units=metric&mode=json&appid=${import.meta.env.VITE_APP_API_KEY}`
+    }
+    await axios(config)
+      .then(async (response) => {
         weatherObj.value = response.data
+        await getWeatherImg(weatherObj.value.weather[0].description)
+        await getCountryImage(weatherObj.value.sys.country)
         doneData.value = true
       })
       .catch((error) => {
@@ -81,8 +31,53 @@ export const weatherStore = defineStore('weatherStore', () => {
         console.log(error)
       })
   }
-  // const geticons = () => {
-  //   axios.get()
-  // }
-  return { weatherObj, doneData, getWeather }
+  const getWeatherImg = async (weather_condition: string) => {
+    const config = {
+      method: 'get',
+      url: `https://api.unsplash.com/search/photos?page=1&per_page=30&query=${weather_condition}&client_id=${import.meta.env.VITE_APP_UNSPLASH_TOKEN}&orientation=landscape`
+    }
+    await axios(config)
+      .then((response) => {
+        const data = response.data
+        const randomNumber = ref(Math.floor(Math.random() * data.results.length))
+        SRC.value = data.results[randomNumber.value].urls.regular
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+  const getCountryName = async (country_code: any) => {
+    const config = {
+      method: 'get',
+      url: 'https://restcountries.com/v3.1/all'
+    }
+    await axios(config)
+      .then((response) => {
+        allCountries.value = response.data
+        country.value = allCountries.value.find((country: any) => {
+          return country.cca2 === country_code
+        })
+      })
+      .catch((error: any) => {
+        console.log(error)
+      })
+  }
+  const getCountryImage = async (counter_Name: any) => {
+    await getCountryName(counter_Name)
+    const config = {
+      method: 'get',
+      url: `https://api.unsplash.com/search/photos?page=1&per_page=30&query=${country.value.name.common}&client_id=${import.meta.env.VITE_APP_UNSPLASH_TOKEN}&orientation=landscape`
+    }
+    await axios(config)
+      .then((response) => {
+        const data = response.data
+        const randomNumber = ref(Math.floor(Math.random() * data.results.length))
+        countrySRC.value = data.results[randomNumber.value].urls.regular
+      })
+      .catch((error: any) => {
+        console.log(error)
+      })
+  }
+
+  return { weatherObj, SRC, countrySRC, doneData, getWeather, getWeatherImg, getCountryImage }
 })

@@ -2,23 +2,23 @@
   <header class="fixed top-0 z-50">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
       <div class="flex lg:flex-1">
-        <a href="#" class="-m-1.5 p-1.5">
+        <a href="#" class="-m-1.5 p-1.5 bg-">
           <span class="sr-only">Your Company</span>
           <img
             v-if="isDark == true"
             class="w-auto h-8"
-            src="https://tailwindui.com/img/logos/mark.svg?color=yellow&shade=600"
+            src="https://tailwindui.com/img/logos/mark.svg?color=orange&shade=700"
             alt=""
           />
           <img
             v-else
             class="w-auto h-8"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+            src="https://tailwindui.com/img/logos/mark.svg?color=white"
             alt=""
           />
         </a>
       </div>
-      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+      <div class="lg:flex lg:flex-1 lg:justify-end">
         <label class="inline-flex items-center cursor-pointer">
           <input type="checkbox" value="" class="sr-only peer" v-model="isDark" @click="toggle" />
           <div

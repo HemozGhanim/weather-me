@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUpdate, onUpdated } from 'vue'
+import { ref, computed, onBeforeUpdate, onUpdated, onBeforeMount, watchEffect } from 'vue'
 import { weatherStore } from '../stores/weather'
 import navBar from './navbar-component.vue'
 import headerImg from '../assets/images/bg-header.jpg'
 import weatherImg from '../assets/images/weather-bg.jpg'
+import { userLocationStore } from '../stores/location'
+const location_Store = userLocationStore()
 const Store = weatherStore()
-const dataDone = ref(false)
+const dataDone = ref(true)
 let weather_obj: any = computed(() => {
   return Store.weatherObj
 })
@@ -19,13 +21,18 @@ const imageClasses = computed(() => {
     imageTransition.value === 'enter' ? 'opacity-100' : 'opacity-0'
   ]
 })
-onMounted(() => {
+
+onBeforeMount(async () => {
+  location_Store.getUserLocation()
+  await Store.getWeather()
+})
+watchEffect(() => {
   if (Store.doneData) {
     setTimeout(() => {
-      dataDone.value = true
-    }, 500)
+      dataDone.value = false
+    }, 1000)
   } else {
-    dataDone.value = false
+    dataDone.value = true
   }
 })
 onBeforeUpdate(() => {
@@ -43,14 +50,13 @@ onUpdated(() => {
   }
 })
 </script>
-
 <template>
   <div
-    v-if="!Store.doneData"
+    v-if="dataDone"
     class="flex items-center justify-center w-screen h-screen text-center text-white bg-indigo-900"
   >
     <svg
-      class="animate-spin h-5 w-5 mr-2 iconsvg"
+      class="w-5 h-5 mr-2 animate-spin iconsvg"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 512 512"
     >
@@ -143,7 +149,7 @@ onUpdated(() => {
           </Transition>
         </div>
         <div
-          class="relative w-full p-2 flex flex-row flex-wrap items-center content-center bg-white h-1/4 dark:bg-orange-700"
+          class="relative flex flex-row flex-wrap items-center content-center w-full p-2 bg-white h-1/4 dark:bg-orange-700"
         >
           <div class="flex flex-row flex-wrap items-center content-center w-full dark:text-white">
             <div class="text-center basis-1/2">

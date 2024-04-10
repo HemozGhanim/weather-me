@@ -1,22 +1,49 @@
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import logoImg from '../assets/logoImage/weather-logo.png'
+
+const isDark = ref<boolean>()
+
+const intervalID = setInterval(() => {
+  localStorage.removeItem('theme')
+
+  isDark.value =
+    localStorage.theme === 'dark' ||
+    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+}, 500)
+
+const toggle = () => {
+  clearInterval(intervalID)
+  isDark.value = !isDark.value
+  if (isDark.value) {
+    localStorage.theme = 'dark'
+    document.documentElement.classList.add('dark')
+  } else {
+    localStorage.theme = 'light'
+    document.documentElement.classList.remove('dark')
+  }
+}
+
+watch(isDark, (newVal) => {
+  if (newVal) {
+    localStorage.theme = 'dark'
+    document.documentElement.classList.add('dark')
+  } else {
+    localStorage.theme = 'light'
+    document.documentElement.classList.remove('dark')
+  }
+})
+</script>
 <template>
   <header class="fixed top-0 z-50">
     <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
-      <div class="flex lg:flex-1">
-        <a href="#" class="-m-1.5 p-1.5 bg-">
-          <span class="sr-only">Your Company</span>
-          <img
-            v-if="isDark == true"
-            class="w-auto h-8"
-            src="https://tailwindui.com/img/logos/mark.svg?color=orange&shade=700"
-            alt=""
-          />
-          <img
-            v-else
-            class="w-auto h-8"
-            src="https://tailwindui.com/img/logos/mark.svg?color=white"
-            alt=""
-          />
+      <div class="flex items-center p-2 rounded-full bg-white/20 dark:bg-black/20">
+        <a href="#" class="-m-1.5 p-1.5">
+          <img class="w-auto h-8" :src="logoImg" alt="" />
         </a>
+        <span class="px-2 font-bold text-white text-small lg:text-2xl dark:text-teal-200"
+          >Weather-Me</span
+        >
       </div>
       <div class="lg:flex lg:flex-1 lg:justify-end">
         <label class="inline-flex items-center cursor-pointer">
@@ -32,80 +59,3 @@
     </nav>
   </header>
 </template>
-
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-const isDark = ref<boolean>()
-// const switcher = ref()
-
-// isDark.value =
-//   localStorage.theme === 'dark' ||
-//   (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-const intervalID = setInterval(() => {
-  localStorage.removeItem('theme')
-
-  isDark.value =
-    localStorage.theme === 'dark' ||
-    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-}, 500)
-// isDark.value =
-//   localStorage.theme === 'dark' ||
-//   (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-// if (isDark.value) {
-//   switcher.value = true
-// } else {
-//   switcher.value = false
-// }
-
-const toggle = () => {
-  clearInterval(intervalID)
-  isDark.value = !isDark.value
-  if (isDark.value) {
-    localStorage.theme = 'dark'
-    document.documentElement.classList.add('dark')
-  } else {
-    localStorage.theme = 'light'
-    document.documentElement.classList.remove('dark')
-  }
-}
-
-watch(isDark, (newVal, oldVal) => {
-  if (newVal) {
-    localStorage.theme = 'dark'
-    document.documentElement.classList.add('dark')
-  } else {
-    localStorage.theme = 'light'
-    document.documentElement.classList.remove('dark')
-  }
-})
-// const intervalId = setInterval(() => {
-//   isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches ? true : false
-// }, 500)
-
-// const testMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
-// watch(testMode, (newVal, oldVal) => {
-//   // intervalId.refresh()
-// })
-// watch(isDark, (newVal, oldVal) => {
-//   const htmlClass = document.documentElement.classList
-
-//   if (newVal == true) {
-//     htmlClass.add('dark')
-//   } else {
-//     htmlClass.remove('dark')
-//   }
-// })
-
-// const toggle = () => {
-//   clearInterval(intervalId)
-//   isDark.value = !isDark.value
-//   const htmlClass = document.documentElement.classList
-//   if (isDark.value) {
-//     htmlClass.add('dark')
-//   } else {
-//     htmlClass.remove('dark')
-//   }
-// }
-</script>

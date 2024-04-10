@@ -14,7 +14,12 @@ export const userLocationStore = defineStore('userLocation', () => {
         cookies.set('userLatitude', userLatitude.value.toString())
         userLongitude.value = position.coords.longitude
         cookies.set('userLongitude', userLongitude.value.toString())
-      })
+      }),
+        () => {
+          alert('Please allow location sharing to continue.')
+        }
+    } else {
+      alert('Geolocation is not supported by this browser.')
     }
   }
 

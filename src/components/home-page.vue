@@ -49,10 +49,6 @@ onUpdated(() => {
     }, 30000)
   }
 })
-
-function testError() {
-  throw new Error('Test Error')
-}
 </script>
 <template>
   <div
@@ -166,7 +162,6 @@ function testError() {
             </div>
           </div>
         </div>
-        <button @click="testError()" class="p-2 text-black bg-white">Test</button>
       </div>
     </div>
   </div>

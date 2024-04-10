@@ -19,17 +19,15 @@ export const weatherStore = defineStore('weatherStore', () => {
       method: 'get',
       url: `https://api.openweathermap.org/data/2.5/weather?lat=${parseFloat(latitude)}&lon=${parseFloat(longitude)}&units=metric&mode=json&appid=${import.meta.env.VITE_APP_API_KEY}`
     }
-    await axios(config)
-      .then(async (response) => {
-        weatherObj.value = response.data
-        await getWeatherImg(weatherObj.value.weather[0].description)
-        await getCountryImage(weatherObj.value.sys.country)
-        doneData.value = true
-      })
-      .catch((error) => {
-        doneData.value = false
-        console.log(error)
-      })
+    const response = await axios(config).catch((error) => {
+      doneData.value = false
+      console.log(error)
+      return
+    })
+    weatherObj.value = response?.data
+    await getWeatherImg(weatherObj.value.weather[0].description)
+    await getCountryImage(weatherObj.value.sys.country)
+    doneData.value = true
   }
   const getWeatherImg = async (weather_condition: string) => {
     const config = {

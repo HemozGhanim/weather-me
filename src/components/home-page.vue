@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  onBeforeUpdate,
-  onUpdated,
-  onMounted,
-  onBeforeMount,
-  watchEffect
-} from 'vue'
+import { ref, computed, onBeforeUpdate, onUpdated, watchEffect } from 'vue'
 import { weatherStore } from '../stores/weather'
 import navBar from './navbar-component.vue'
 import headerImg from '../assets/images/bg-header.jpg'

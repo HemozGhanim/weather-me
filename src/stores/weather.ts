@@ -7,17 +7,17 @@ export const weatherStore = defineStore('weatherStore', () => {
   const weatherObj = ref<any>()
   const doneData = ref(false)
   const { cookies } = useCookies()
-  const latitude = cookies.get('userLatitude')
-  const longitude = cookies.get('userLongitude')
+  const latitude = parseFloat(cookies.get('userLatitude'))
+  const longitude = parseFloat(cookies.get('userLongitude'))
   const SRC = ref('')
   const allCountries = ref<any>()
   const country = ref<any>()
   const countrySRC = ref('')
 
-  const getWeather = async () => {
+  const getWeather = async (lat: number, long: number) => {
     const config = {
       method: 'get',
-      url: `https://api.openweathermap.org/data/2.5/weather?lat=${parseFloat(latitude)}&lon=${parseFloat(longitude)}&units=metric&mode=json&appid=${import.meta.env.VITE_APP_API_KEY}`
+      url: `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&units=metric&mode=json&appid=${import.meta.env.VITE_APP_API_KEY}`
     }
     const response = await axios(config).catch((error) => {
       doneData.value = false
@@ -77,5 +77,15 @@ export const weatherStore = defineStore('weatherStore', () => {
       })
   }
 
-  return { weatherObj, SRC, countrySRC, doneData, getWeather, getWeatherImg, getCountryImage }
+  return {
+    weatherObj,
+    SRC,
+    countrySRC,
+    doneData,
+    latitude,
+    longitude,
+    getWeather,
+    getWeatherImg,
+    getCountryImage
+  }
 })

@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, onBeforeUpdate, onUpdated, onBeforeMount, watchEffect } from 'vue'
+import {
+  ref,
+  computed,
+  onBeforeUpdate,
+  onUpdated,
+  onMounted,
+  onBeforeMount,
+  watchEffect
+} from 'vue'
 import { weatherStore } from '../stores/weather'
 import navBar from './navbar-component.vue'
 import headerImg from '../assets/images/bg-header.jpg'
@@ -8,6 +16,7 @@ import { userLocationStore } from '../stores/location'
 const location_Store = userLocationStore()
 const Store = weatherStore()
 const dataDone = ref(true)
+const finishLoading = ref(false)
 let weather_obj: any = computed(() => {
   return Store.weatherObj
 })
@@ -21,18 +30,16 @@ const imageClasses = computed(() => {
     imageTransition.value === 'enter' ? 'opacity-100' : 'opacity-0'
   ]
 })
-
-onBeforeMount(async () => {
-  location_Store.getUserLocation()
-  await Store.getWeather()
-})
+location_Store.getUserLocation()
 watchEffect(() => {
   if (Store.doneData) {
+    finishLoading.value = true
     setTimeout(() => {
       dataDone.value = false
-    }, 1000)
+    }, 500)
   } else {
     dataDone.value = true
+    finishLoading.value = false
   }
 })
 onBeforeUpdate(() => {
@@ -43,10 +50,10 @@ onUpdated(() => {
   if (Store.doneData) {
     timer.value = setInterval(() => {
       Store.getWeatherImg(weather_obj.value.weather[0].description)
-    }, 20000)
+    }, 10000)
     timerCountry.value = setInterval(() => {
       Store.getCountryImage(weather_obj.value.sys.country)
-    }, 30000)
+    }, 15000)
   }
 })
 </script>
@@ -55,17 +62,32 @@ onUpdated(() => {
     v-if="dataDone"
     class="flex items-center justify-center w-screen h-screen text-center text-white bg-indigo-900"
   >
-    <svg
-      class="w-5 h-5 mr-2 animate-spin iconsvg"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 512 512"
-    >
-      <path
-        fill="#ffffff"
-        d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"
-      />
-    </svg>
-    loading...
+    <div v-if="finishLoading">
+      <svg
+        class="inline-block w-5 h-5 mr-2 iconsvg"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 448 512"
+      >
+        <path
+          fill="#ffffff"
+          d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"
+        />
+      </svg>
+      Done
+    </div>
+    <div v-else>
+      <svg
+        class="inline-block w-5 h-5 mr-2 animate-spin iconsvg"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+      >
+        <path
+          fill="#ffffff"
+          d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"
+        />
+      </svg>
+      loading...
+    </div>
   </div>
   <div
     v-else

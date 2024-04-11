@@ -9,7 +9,7 @@ const getLocation = () => {
 </script>
 <template>
   <div
-    class="flex flex-wrap items-center content-center justify-center w-full h-screen text-center text-white"
+    class="flex flex-wrap items-center content-center justify-center w-full h-screen text-center text-white bg-indigo-900"
   >
     <span class="w-[50%] sm:w-[30%] md:w-[20%] lg:w-[20%] xl:w-[20%]">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#ffffff">
@@ -27,7 +27,7 @@ const getLocation = () => {
     <router-link
       to="/"
       @click="getLocation()"
-      class="p-4 font-medium text-white bg-blue-700 rounded-full"
+      class="p-4 font-medium text-white bg-orange-500 rounded-full"
       >Get Your Location</router-link
     >
   </div>
